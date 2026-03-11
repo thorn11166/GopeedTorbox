@@ -1,0 +1,90 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - windows
+          - macos
+          - linux
+
+jobs:
+  build-android:
+    if: ${{ github.event.inputs.platform == 'android' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install gomobile
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          gomobile init
+
+      - name: Build Android AAR (libgopeed)
+        run: |
+          cd bind/mobile
+          gomobile bind \
+            -target=android \
+            -androidapi=21 \
+            -o ../../ui/flutter/android/app/libs/libgopeed.aar \
+            .
+
+      - name: Decode keystore
+        env:
+          APK_KEYSTORE: ${{ secrets.APK_KEYSTORE }}
+        run: |
+          echo "$APK_KEYSTORE" | base64 -d > ui/flutter/android/app/upload-keystore.jks
+
+      - name: Build APK
+        env:
+          APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
+          APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
+        run: |
+          cd ui/flutter
+          flutter pub get
+          flutter build apk --release --split-per-abi
+
+      - name: Build Universal APK
+        env:
+          APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
+          APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
+        run: |
+          cd ui/flutter
+          flutter build apk --release
+
+      - name: Upload APKs to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          files: |
+            ui/flutter/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            ui/flutter/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            ui/flutter/build/app/outputs/flutter-apk/app-x86_64-release.apk
+            ui/flutter/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
