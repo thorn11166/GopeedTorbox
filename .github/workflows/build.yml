@@ -18,8 +18,6 @@ jobs:
   build-android:
     if: ${{ github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
-    env:
-      GOTOOLCHAIN: local
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,15 +28,12 @@ jobs:
           shopt -s dotglob
           cp -r src-extract/gopeed-torbox/. .
           rm -rf src-extract
-          # Pin go.mod to installed toolchain to prevent remote download
-          sed -i 's/^go [0-9.]*/go 1.24.7/' go.mod
-          sed -i 's/^toolchain go[0-9.]*/toolchain go1.24.7/' go.mod
           echo "go.mod header:" && head -5 go.mod
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.7'
+          go-version: '>=1.25.0'
           cache-dependency-path: go.sum
 
       - name: Set up Java
@@ -69,12 +64,12 @@ jobs:
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
           echo "## Environment" >> $GITHUB_STEP_SUMMARY
           echo "- NDK: $NDK_DIR" >> $GITHUB_STEP_SUMMARY
-          echo "- Go: $(GOTOOLCHAIN=local go version)" >> $GITHUB_STEP_SUMMARY
+          echo "- Go: $(go version)" >> $GITHUB_STEP_SUMMARY
 
       - name: Install gomobile
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20250417013019-a6e5ea6b1db2
-          go install golang.org/x/mobile/cmd/gobind@v0.0.0-20250417013019-a6e5ea6b1db2
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install golang.org/x/mobile/cmd/gobind@latest
           gomobile init
 
       - name: Build Android AAR (libgopeed)
