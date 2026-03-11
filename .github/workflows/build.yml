@@ -18,6 +18,8 @@ jobs:
   build-android:
     if: ${{ github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
+    env:
+      GOTOOLCHAIN: local
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +27,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.x'
+          go-version: '>=1.24.9'
           cache-dependency-path: go.sum
 
       - name: Set up Java
@@ -54,16 +56,21 @@ jobs:
           fi
           echo "Found NDK: $NDK_DIR"
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
+          echo "## NDK Info" >> $GITHUB_STEP_SUMMARY
+          echo "NDK: $NDK_DIR" >> $GITHUB_STEP_SUMMARY
+          echo "Go: $(go version)" >> $GITHUB_STEP_SUMMARY
 
       - name: Install gomobile
         run: |
           go install golang.org/x/mobile/cmd/gomobile@latest
           go install golang.org/x/mobile/cmd/gobind@latest
           gomobile init
+          echo "gomobile: $(gomobile version 2>&1 || true)" >> $GITHUB_STEP_SUMMARY
 
       - name: Build Android AAR (libgopeed)
         run: |
           mkdir -p ui/flutter/android/app/libs
+          set -o pipefail
           gomobile bind \
             -tags nosqlite \
             -ldflags="-w -s -checklinkname=0 -X github.com/GopeedLab/gopeed/pkg/base.Version=v1.0.0" \
@@ -71,7 +78,12 @@ jobs:
             -androidapi=21 \
             -javapkg=com.gopeed \
             -o ui/flutter/android/app/libs/libgopeed.aar \
-            github.com/GopeedLab/gopeed/bind/mobile
+            github.com/GopeedLab/gopeed/bind/mobile \
+            2>&1 | tee /tmp/gomobile-out.txt
+          EXIT=${PIPESTATUS[0]}
+          echo "## Gomobile Output" >> $GITHUB_STEP_SUMMARY
+          cat /tmp/gomobile-out.txt >> $GITHUB_STEP_SUMMARY
+          exit $EXIT
 
       - name: Decode keystore
         env:
