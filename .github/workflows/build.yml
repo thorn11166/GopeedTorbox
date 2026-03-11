@@ -29,10 +29,17 @@ jobs:
           cp -r src-extract/gopeed-torbox/. .
           rm -rf src-extract
 
+      - name: Patch go.mod toolchain
+        run: |
+          sed -i 's/^toolchain go1\..*//' go.mod
+          sed -i 's/^go 1\.24\..*/go 1.24.7/' go.mod
+          echo "go.mod after patch:"
+          head -5 go.mod
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '>=1.25.0'
+          go-version: '1.24.7'
           cache-dependency-path: go.sum
 
       - name: Set up Java
@@ -63,16 +70,22 @@ jobs:
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
 
       - name: Install gomobile
+        env:
+          GOTOOLCHAIN: local
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@latest
-          go install golang.org/x/mobile/cmd/gobind@latest
+          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20250417013019-a6e5ea6b1db2
+          go install golang.org/x/mobile/cmd/gobind@v0.0.0-20250417013019-a6e5ea6b1db2
           gomobile init
 
       - name: Build Android AAR (libgopeed)
+        id: gomobile-build
+        continue-on-error: true
+        env:
+          GOTOOLCHAIN: local
         run: |
           mkdir -p ui/flutter/android/app/libs
-          set -o pipefail
           gomobile bind \
+            -v \
             -tags nosqlite \
             -ldflags="-w -s -checklinkname=0 -X github.com/GopeedLab/gopeed/pkg/base.Version=v1.0.0" \
             -target=android \
@@ -80,8 +93,22 @@ jobs:
             -javapkg=com.gopeed \
             -o ui/flutter/android/app/libs/libgopeed.aar \
             github.com/GopeedLab/gopeed/bind/mobile \
-            2>&1 | tee /tmp/gomobile-out.txt
-          exit ${PIPESTATUS[0]}
+            > /tmp/gomobile-out.txt 2>&1
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: Report gomobile result
+        if: always()
+        run: |
+          echo "## Gomobile Output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -100 /tmp/gomobile-out.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          # Emit last 30 lines as annotation for easy API access
+          LAST=$(tail -30 /tmp/gomobile-out.txt 2>/dev/null | tr '\n' '|' | head -c 60000)
+          echo "::error title=Gomobile Output::${LAST}"
+          if [ "${{ steps.gomobile-build.outcome }}" = "failure" ]; then
+            exit 1
+          fi
 
       - name: Decode keystore
         env:
