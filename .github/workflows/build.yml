@@ -29,17 +29,10 @@ jobs:
           cp -r src-extract/gopeed-torbox/. .
           rm -rf src-extract
 
-      - name: Patch go.mod toolchain
-        run: |
-          sed -i 's/^toolchain go1\..*//' go.mod
-          sed -i 's/^go 1\.24\..*/go 1.24.7/' go.mod
-          echo "go.mod after patch:"
-          head -5 go.mod
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.7'
+          go-version: '>=1.25.0'
           cache-dependency-path: go.sum
 
       - name: Set up Java
@@ -70,18 +63,14 @@ jobs:
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
 
       - name: Install gomobile
-        env:
-          GOTOOLCHAIN: local
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20250417013019-a6e5ea6b1db2
-          go install golang.org/x/mobile/cmd/gobind@v0.0.0-20250417013019-a6e5ea6b1db2
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install golang.org/x/mobile/cmd/gobind@latest
           gomobile init
 
       - name: Build Android AAR (libgopeed)
         id: gomobile-build
         continue-on-error: true
-        env:
-          GOTOOLCHAIN: local
         run: |
           mkdir -p ui/flutter/android/app/libs
           gomobile bind \
@@ -94,18 +83,17 @@ jobs:
             -o ui/flutter/android/app/libs/libgopeed.aar \
             github.com/GopeedLab/gopeed/bind/mobile \
             > /tmp/gomobile-out.txt 2>&1
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
 
-      - name: Report gomobile result
+      - name: Report gomobile output
         if: always()
         run: |
-          echo "## Gomobile Output" >> $GITHUB_STEP_SUMMARY
+          echo "## Gomobile Build Output" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -100 /tmp/gomobile-out.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No output" >> $GITHUB_STEP_SUMMARY
+          tail -80 /tmp/gomobile-out.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No output" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          # Emit last 30 lines as annotation for easy API access
-          LAST=$(tail -30 /tmp/gomobile-out.txt 2>/dev/null | tr '\n' '|' | head -c 60000)
-          echo "::error title=Gomobile Output::${LAST}"
+          # Emit last 40 lines as error annotation (pipe-delimited for single line)
+          LAST=$(tail -40 /tmp/gomobile-out.txt 2>/dev/null | tr '\n' '|')
+          echo "::error title=Gomobile Last 40 Lines::${LAST}"
           if [ "${{ steps.gomobile-build.outcome }}" = "failure" ]; then
             exit 1
           fi
