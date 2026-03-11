@@ -71,7 +71,6 @@ jobs:
       - name: Add golang.org/x/mobile dependency
         run: |
           go get golang.org/x/mobile@latest
-          go mod tidy
 
       - name: Build Android AAR (libgopeed)
         id: gomobile-build
