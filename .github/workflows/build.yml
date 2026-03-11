@@ -31,7 +31,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: '17'
 
       - name: Set up Flutter
@@ -46,7 +46,6 @@ jobs:
           ANDROID_SDK=/usr/local/lib/android/sdk
           echo "ANDROID_HOME=${ANDROID_SDK}" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=${ANDROID_SDK}" >> $GITHUB_ENV
-          # Find the latest installed NDK version
           NDK_DIR=$(ls -d ${ANDROID_SDK}/ndk/* 2>/dev/null | sort -V | tail -1)
           if [ -z "$NDK_DIR" ]; then
             echo "No NDK found, installing..."
@@ -55,7 +54,6 @@ jobs:
           fi
           echo "Found NDK: $NDK_DIR"
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
-          echo "NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
 
       - name: Install gomobile
         run: |
@@ -67,9 +65,11 @@ jobs:
         run: |
           mkdir -p ui/flutter/android/app/libs
           gomobile bind \
+            -tags nosqlite \
+            -ldflags="-w -s -checklinkname=0 -X github.com/GopeedLab/gopeed/pkg/base.Version=v1.0.0" \
             -target=android \
             -androidapi=21 \
-            -v \
+            -javapkg=com.gopeed \
             -o ui/flutter/android/app/libs/libgopeed.aar \
             github.com/GopeedLab/gopeed/bind/mobile
 
