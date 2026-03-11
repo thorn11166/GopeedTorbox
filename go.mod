@@ -1,8 +1,8 @@
 module github.com/GopeedLab/gopeed
 
-go 1.24.9
+go 1.24.7
 
-toolchain go1.24.11
+toolchain go1.24.7
 
 require (
 	github.com/anacrolix/torrent v1.60.1-0.20251217073903-486bcbe758e0
