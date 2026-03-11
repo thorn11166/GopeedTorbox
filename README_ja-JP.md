@@ -14,34 +14,26 @@
 
 [English](/README.md) | [中文](/README_zh-CN.md) | [日本語](/README_ja-JP.md) | [正體中文](/README_zh-TW.md) | [Tiếng Việt](/README_vi-VN.md)
 
-## 🚀 Introduction
+## 🚀 はじめに
 
-Gopeed (full name Go Speed), a high-speed downloader developed by `Golang` + `Flutter`, supports (HTTP, BitTorrent, Magnet) protocol, and supports all platforms. In addition to basic download functions, Gopeed is also a highly customizable downloader that supports implementing more features through integration with [APIs](https://docs.gopeed.com/dev-api.html) or installation and development of [extensions](https://docs.gopeed.com/dev-extension.html).
+Gopeed (正式名 Go Speed) は `Golang` + `Flutter` によって開発された高速ダウンローダーで、(HTTP、BitTorrent、Magnet) プロトコルをサポートし、すべてのプラットフォームをサポートします。基本的なダウンロード機能に加え、[APIs](https://docs.gopeed.com/dev-api.html)との連動や[拡張機能](https://docs.gopeed.com/dev-extension.html)のインストール・開発による追加機能にも対応した、カスタマイズ性の高いダウンローダーです。
 
-Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://docs.gopeed.com)
+見て下さい ✈ [公式ウェブサイト](https://gopeed.com) | 📖 [開発ドキュメント](https://docs.gopeed.com)
 
-## ⬇️ Download
+## ⬇️ インストール
 
 <table>
   <tbody>
     <tr>
-      <td rowspan="4">🪟 Windows</td>
-      <td rowspan="2"><code>EXE</code></td>
+      <td rowspan="2">🪟 Windows</td>
+      <td><code>EXE</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64.zip">📥</a></td>
     </tr>
     <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td rowspan="2"><code>Portable</code></td>
+      <td><code>Portable</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64-portable.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64-portable.zip">📥</a></td>
     </tr>
     <tr>
       <td rowspan="3">🍎 MacOS</td>
@@ -164,63 +156,52 @@ Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://
     </tr>
   </tbody>
 </table>
+インストールについての詳細は、[インストール](https://docs.gopeed.com/install.html)を参照してください。
 
-More about installation, please refer to [Installation](https://docs.gopeed.com/install.html)
+### 🛠️ コマンドツール
 
-### 🛠️ Command tool
+## 📱 WeChat 公式アカウント
 
-use `go install`:
-
-```bash
-go install github.com/GopeedLab/gopeed/cmd/gopeed@latest
-```
-
-## 🔌 Browser Extension
-
-Gopeed also provides a browser extension to take over browser downloads, supporting browsers such as Chrome, Edge, Firefox, etc., please refer to: [https://github.com/GopeedLab/browser-extension](https://github.com/GopeedLab/browser-extension)
-
-## 📱 WeChat Official Account
-
-Follow our WeChat Official Account to get the latest updates and news.
+公式アカウントをフォローして、最新のアップデートやニュースを入手してください。
 
 <img src="_docs/img/weixin.png" width="200" />
 
-## 💝 Donate
+## 💝 寄付
 
-If you like this project, please consider [donating](https://docs.gopeed.com/donate.html) to support the development of this project, thank you!
+もしこのプロジェクトがお気に召しましたら、このプロジェクトの発展を支援するために[寄付](https://docs.gopeed.com/donate.html)をご検討ください！
 
-## 🖼️ Showcase
+## 🖼️ ショーケース
 
 ![](_docs/img/ui-demo.png)
 
-## 👨‍💻 Development
+## 👨‍💻 開発
 
-This project is divided into two parts, the front end uses `flutter`, the back end uses `Golang`, and the two sides communicate through the `http` protocol. On the unix system, `unix socket` is used, and on the windows system, `tcp` protocol is used.
+このプロジェクトは二つの部分に分かれており、フロントエンドでは `flutter` を、バックエンドでは `Golang` を使用し、両者は `http` プロトコルで通信する。ユニックスシステムでは `unix socket` を、ウィンドウズシステムでは `tcp` プロトコルを使用します。
 
-> The front code is located in the `ui/flutter` directory.
+> フロントコードは `ui/flutter` ディレクトリにあります。
 
-### 🌍 Environment
+### 🌍 環境
 
-1. Golang 1.24+
+1. Go 言語 1.24+
 2. Flutter 3.38+
 
-### 📋 Clone
+### 📋 クローン
 
 ```bash
 git clone git@github.com:GopeedLab/gopeed.git
 ```
 
-### 🤝 Contributing
+### 🤝 コントリビュート
 
-Please refer to [CONTRIBUTING.md](/CONTRIBUTING.md)
+[CONTRIBUTING.md](/CONTRIBUTING_ja-JP.md) をご参照ください
 
-### 🏗️ Build
+### 🏗️ ビルド
 
-#### Desktop
+#### デスクトップ
 
-First, you need to configure the environment according to the official [Flutter desktop website documention](https://docs.flutter.dev/development/platform-integration/desktop), then you will need to ensure the cgo environment is set up accordingly. For detailed instructions on setting up the cgo environment, please refer to relevant resources available online.
+まず、[flutter デスクトップ公式サイトドキュメント](https://docs.flutter.dev/development/platform-integration/desktop)に従って環境を設定し、自分で検索できる `cgo` 環境を用意します。
 
-command:
+コマンド:
 
 - windows
 
@@ -246,9 +227,9 @@ cd ui/flutter
 flutter build linux
 ```
 
-#### Mobile
+#### モバイル
 
-Same as before, you also need to prepare the `cgo` environment, and then install `gomobile`:
+先ほどと同じように、`cgo` 環境を準備し、`gomobile` をインストールする必要があります:
 
 ```bash
 go install golang.org/x/mobile/cmd/gomobile@latest
@@ -256,7 +237,7 @@ go get golang.org/x/mobile/bind
 gomobile init
 ```
 
-command:
+コマンド:
 
 - android
 
@@ -276,7 +257,7 @@ flutter build ios --no-codesign
 
 #### Web
 
-command:
+コマンド:
 
 ```bash
 cd ui/flutter
@@ -287,18 +268,18 @@ cp -r ui/flutter/build/web cmd/web/dist
 go build -tags nosqlite,web -ldflags="-s -w" -o bin/ github.com/GopeedLab/gopeed/cmd/web
 ```
 
-## ❤️ Credits
+## ❤️ 感謝
 
-### 👥 Contributors
+### コントリビューター
 
 <a href="https://github.com/GopeedLab/gopeed/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=GopeedLab/gopeed" />
 </a>
 
-### 🏢 JetBrains
+### JetBrains
 
 [![goland](_docs/img/goland.svg)](https://www.jetbrains.com/?from=gopeed)
 
-## 📄 License
+## ライセンス
 
 [GPLv3](LICENSE)

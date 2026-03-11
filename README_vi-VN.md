@@ -1,10 +1,10 @@
 # [![](_docs/img/banner.svg)](https://gopeed.com)
 
-[![Test Status](https://github.com/GopeedLab/gopeed/workflows/test/badge.svg)](https://github.com/GopeedLab/gopeed/actions?query=workflow%3Atest)
+[![Trạng thái kiểm tra](https://github.com/GopeedLab/gopeed/workflows/test/badge.svg)](https://github.com/GopeedLab/gopeed/actions?query=workflow%3Atest)
 [![Codecov](https://codecov.io/gh/GopeedLab/gopeed/branch/main/graph/badge.svg)](https://codecov.io/gh/GopeedLab/gopeed)
-[![Release](https://img.shields.io/github/release/GopeedLab/gopeed.svg)](https://github.com/GopeedLab/gopeed/releases)
-[![Download](https://img.shields.io/github/downloads/GopeedLab/gopeed/total.svg)](https://github.com/GopeedLab/gopeed/releases)
-[![Donate](https://img.shields.io/badge/%24-donate-ff69b4.svg)](https://docs.gopeed.com/donate.html)
+[![Phiên bản](https://img.shields.io/github/release/GopeedLab/gopeed.svg)](https://github.com/GopeedLab/gopeed/releases)
+[![Tải về](https://img.shields.io/github/downloads/GopeedLab/gopeed/total.svg)](https://github.com/GopeedLab/gopeed/releases)
+[![Ủng hộ](https://img.shields.io/badge/%24-ủng%20hộ-ff69b4.svg)](https://docs.gopeed.com/donate.html)
 [![WeChat](https://img.shields.io/badge/WeChat%20Official%20Account-07C160?logo=wechat&logoColor=white)](https://raw.githubusercontent.com/GopeedLab/gopeed/main/_docs/img/weixin.png)
 [![Discord](https://img.shields.io/discord/1037992631881449472?label=Discord&logo=discord&style=social)](https://discord.gg/ZUJqJrwCGB)
 
@@ -14,34 +14,26 @@
 
 [English](/README.md) | [中文](/README_zh-CN.md) | [日本語](/README_ja-JP.md) | [正體中文](/README_zh-TW.md) | [Tiếng Việt](/README_vi-VN.md)
 
-## 🚀 Introduction
+## 🚀 Giới thiệu
 
-Gopeed (full name Go Speed), a high-speed downloader developed by `Golang` + `Flutter`, supports (HTTP, BitTorrent, Magnet) protocol, and supports all platforms. In addition to basic download functions, Gopeed is also a highly customizable downloader that supports implementing more features through integration with [APIs](https://docs.gopeed.com/dev-api.html) or installation and development of [extensions](https://docs.gopeed.com/dev-extension.html).
+Gopeed (tên đầy đủ Go Speed), một công cụ tải xuống tốc độ cao được phát triển bởi `Golang` + `Flutter`, hỗ trợ giao thức (HTTP, BitTorrent, Magnet) và hỗ trợ tất cả các nền tảng. Ngoài các chức năng tải xuống cơ bản, Gopeed còn là một công cụ tải xuống có thể tùy chỉnh cao cho phép triển khai thêm tính năng thông qua việc tích hợp với [APIs](https://docs.gopeed.com/dev-api.html) hoặc cài đặt và phát triển các [tiện ích mở rộng](https://docs.gopeed.com/dev-extension.html).
 
-Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://docs.gopeed.com)
+Truy cập ✈ [Trang web chính thức](https://gopeed.com) | 📖 [Tài liệu chính thức](https://docs.gopeed.com)
 
-## ⬇️ Download
+## ⬇️ Tải về
 
 <table>
   <tbody>
     <tr>
-      <td rowspan="4">🪟 Windows</td>
-      <td rowspan="2"><code>EXE</code></td>
+      <td rowspan="2">🪟 Windows</td>
+      <td><code>EXE</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64.zip">📥</a></td>
     </tr>
     <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td rowspan="2"><code>Portable</code></td>
+      <td><code>Portable</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64-portable.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64-portable.zip">📥</a></td>
     </tr>
     <tr>
       <td rowspan="3">🍎 MacOS</td>
@@ -164,40 +156,35 @@ Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://
     </tr>
   </tbody>
 </table>
+Thêm thông tin về cài đặt, vui lòng tham khảo [Cài đặt](https://docs.gopeed.com/install.html)
 
-More about installation, please refer to [Installation](https://docs.gopeed.com/install.html)
+### 🛠️ Công cụ lệnh
 
-### 🛠️ Command tool
-
-use `go install`:
+Sử dụng `go install`:
 
 ```bash
 go install github.com/GopeedLab/gopeed/cmd/gopeed@latest
 ```
 
-## 🔌 Browser Extension
-
-Gopeed also provides a browser extension to take over browser downloads, supporting browsers such as Chrome, Edge, Firefox, etc., please refer to: [https://github.com/GopeedLab/browser-extension](https://github.com/GopeedLab/browser-extension)
-
 ## 📱 WeChat Official Account
 
-Follow our WeChat Official Account to get the latest updates and news.
+Theo dõi tài khoản chính thức để nhận các cập nhật và tin tức mới nhất.
 
 <img src="_docs/img/weixin.png" width="200" />
 
-## 💝 Donate
+## 💝 Quyên góp
 
-If you like this project, please consider [donating](https://docs.gopeed.com/donate.html) to support the development of this project, thank you!
+Nếu bạn thích dự án này, xin vui lòng xem xét [quyên góp](https://docs.gopeed.com/donate.html) để hỗ trợ phát triển dự án này, cảm ơn bạn!
 
-## 🖼️ Showcase
+## 🖼️ Trưng bày
 
 ![](_docs/img/ui-demo.png)
 
 ## 👨‍💻 Development
 
-This project is divided into two parts, the front end uses `flutter`, the back end uses `Golang`, and the two sides communicate through the `http` protocol. On the unix system, `unix socket` is used, and on the windows system, `tcp` protocol is used.
+Dự án này được chia thành hai phần, phần giao diện sử dụng `flutter`, phần backend sử dụng `Golang`, và hai phía giao tiếp thông qua giao thức `http`. Trên hệ thống unix, sử dụng `unix socket`, và trên hệ thống windows, sử dụng giao thức `tcp`.
 
-> The front code is located in the `ui/flutter` directory.
+> Mã giao diện nằm trong thư mục `ui/flutter`.
 
 ### 🌍 Environment
 
@@ -210,15 +197,15 @@ This project is divided into two parts, the front end uses `flutter`, the back e
 git clone git@github.com:GopeedLab/gopeed.git
 ```
 
-### 🤝 Contributing
+### 🤝 Đóng góp
 
-Please refer to [CONTRIBUTING.md](/CONTRIBUTING.md)
+Vui lòng tham khảo [CONTRIBUTING_vi-VN.md](/CONTRIBUTING_vi-VN.md)
 
-### 🏗️ Build
+### 🏗️ Xây dựng
 
 #### Desktop
 
-First, you need to configure the environment according to the official [Flutter desktop website documention](https://docs.flutter.dev/development/platform-integration/desktop), then you will need to ensure the cgo environment is set up accordingly. For detailed instructions on setting up the cgo environment, please refer to relevant resources available online.
+Trước tiên, bạn cần cấu hình môi trường theo tài liệu chính thức của [Tài liệu trang web máy tính để bàn Flutter](https://docs.flutter.dev/development/platform-integration/desktop), sau đó bạn cần đảm bảo môi trường cgo được thiết lập đúng. Để biết hướng dẫn chi tiết về cách thiết lập môi trường cgo, vui lòng tham khảo các tài liệu tương ứng có sẵn trực tuyến.
 
 command:
 
@@ -248,7 +235,7 @@ flutter build linux
 
 #### Mobile
 
-Same as before, you also need to prepare the `cgo` environment, and then install `gomobile`:
+Giống như trước đây, bạn cũng cần chuẩn bị môi trường `cgo` và sau đó cài đặt `gomobile`:
 
 ```bash
 go install golang.org/x/mobile/cmd/gomobile@latest
@@ -287,18 +274,18 @@ cp -r ui/flutter/build/web cmd/web/dist
 go build -tags nosqlite,web -ldflags="-s -w" -o bin/ github.com/GopeedLab/gopeed/cmd/web
 ```
 
-## ❤️ Credits
+## ❤️ Tín dụng
 
-### 👥 Contributors
+### Người đóng góp
 
 <a href="https://github.com/GopeedLab/gopeed/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=GopeedLab/gopeed" />
 </a>
 
-### 🏢 JetBrains
+### JetBrains
 
 [![goland](_docs/img/goland.svg)](https://www.jetbrains.com/?from=gopeed)
 
-## 📄 License
+## Giấy phép
 
 [GPLv3](LICENSE)

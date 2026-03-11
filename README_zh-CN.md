@@ -4,8 +4,8 @@
 [![Codecov](https://codecov.io/gh/GopeedLab/gopeed/branch/main/graph/badge.svg)](https://codecov.io/gh/GopeedLab/gopeed)
 [![Release](https://img.shields.io/github/release/GopeedLab/gopeed.svg)](https://github.com/GopeedLab/gopeed/releases)
 [![Download](https://img.shields.io/github/downloads/GopeedLab/gopeed/total.svg)](https://github.com/GopeedLab/gopeed/releases)
-[![Donate](https://img.shields.io/badge/%24-donate-ff69b4.svg)](https://docs.gopeed.com/donate.html)
-[![WeChat](https://img.shields.io/badge/WeChat%20Official%20Account-07C160?logo=wechat&logoColor=white)](https://raw.githubusercontent.com/GopeedLab/gopeed/main/_docs/img/weixin.png)
+[![Donate](https://img.shields.io/badge/%24-donate-ff69b4.svg)](https://docs.gopeed.com/zh/donate.html)
+[![WeChat](https://img.shields.io/badge/%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7-07C160?logo=wechat&logoColor=white)](https://raw.githubusercontent.com/GopeedLab/gopeed/main/_docs/img/weixin.png)
 [![Discord](https://img.shields.io/discord/1037992631881449472?label=Discord&logo=discord&style=social)](https://discord.gg/ZUJqJrwCGB)
 
 <a href="https://trendshift.io/repositories/7953" target="_blank"><img src="https://trendshift.io/api/badge/repositories/7953" alt="GopeedLab%2Fgopeed | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
@@ -14,34 +14,26 @@
 
 [English](/README.md) | [中文](/README_zh-CN.md) | [日本語](/README_ja-JP.md) | [正體中文](/README_zh-TW.md) | [Tiếng Việt](/README_vi-VN.md)
 
-## 🚀 Introduction
+## 🚀 介绍
 
-Gopeed (full name Go Speed), a high-speed downloader developed by `Golang` + `Flutter`, supports (HTTP, BitTorrent, Magnet) protocol, and supports all platforms. In addition to basic download functions, Gopeed is also a highly customizable downloader that supports implementing more features through integration with [APIs](https://docs.gopeed.com/dev-api.html) or installation and development of [extensions](https://docs.gopeed.com/dev-extension.html).
+Gopeed（全称 Go Speed），直译过来中文名叫做`够快下载器`（不是狗屁下载器！），是一款由`Golang`+`Flutter`开发的高速下载器，支持（HTTP、BitTorrent、Magnet）协议下载，并且支持全平台使用。除了基本的下载功能外，Gopeed 还是一款高度可定制化的下载器，支持通过对接[APIs](https://docs.gopeed.com/zh/dev-api.html)或者安装和开发[扩展](https://docs.gopeed.com/zh/dev-extension.html)来实现更多的功能。
 
-Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://docs.gopeed.com)
+访问 ✈ [官方网站](https://gopeed.com/zh-CN) | 📖 [官方文档](https://docs.gopeed.com/zh/)
 
-## ⬇️ Download
+## ⬇️ 下载
 
 <table>
   <tbody>
     <tr>
-      <td rowspan="4">🪟 Windows</td>
-      <td rowspan="2"><code>EXE</code></td>
+      <td rowspan="2">🪟 Windows</td>
+      <td><code>EXE</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64.zip">📥</a></td>
     </tr>
     <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td rowspan="2"><code>Portable</code></td>
+      <td><code>Portable</code></td>
       <td>amd64</td>
       <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-amd64-portable.zip">📥</a></td>
-    </tr>
-    <tr>
-      <td>arm64</td>
-      <td><a href="https://gopeed.com/api/download?tpl=Gopeed-$version-windows-arm64-portable.zip">📥</a></td>
     </tr>
     <tr>
       <td rowspan="3">🍎 MacOS</td>
@@ -164,63 +156,62 @@ Visit ✈ [Official Website](https://gopeed.com) | 📖 [Official Docs](https://
     </tr>
   </tbody>
 </table>
+更多关于安装的内容请参考[安装文档](https://docs.gopeed.com/zh/install.html)
 
-More about installation, please refer to [Installation](https://docs.gopeed.com/install.html)
+### 🛠️ 命令行工具
 
-### 🛠️ Command tool
-
-use `go install`:
+使用`go install`安装：
 
 ```bash
 go install github.com/GopeedLab/gopeed/cmd/gopeed@latest
 ```
 
-## 🔌 Browser Extension
+## 🔌 浏览器扩展
 
-Gopeed also provides a browser extension to take over browser downloads, supporting browsers such as Chrome, Edge, Firefox, etc., please refer to: [https://github.com/GopeedLab/browser-extension](https://github.com/GopeedLab/browser-extension)
+Gopeed 还提供了浏览器扩展用于接管浏览器下载，支持 Chrome、Edge、Firefox 等浏览器，具体请参考：[https://github.com/GopeedLab/browser-extension](https://github.com/GopeedLab/browser-extension)
 
-## 📱 WeChat Official Account
+## 📱 微信公众号
 
-Follow our WeChat Official Account to get the latest updates and news.
+关注公众号获取项目最新动态和资讯。
 
 <img src="_docs/img/weixin.png" width="200" />
 
-## 💝 Donate
+## 💝 赞助
 
-If you like this project, please consider [donating](https://docs.gopeed.com/donate.html) to support the development of this project, thank you!
+如果觉得项目对你有帮助，请考虑[赞助](https://docs.gopeed.com/zh/donate)以支持这个项目的发展，非常感谢！
 
-## 🖼️ Showcase
+## 🖼️ 界面展示
 
 ![](_docs/img/ui-demo.png)
 
-## 👨‍💻 Development
+## 👨‍💻 开发
 
-This project is divided into two parts, the front end uses `flutter`, the back end uses `Golang`, and the two sides communicate through the `http` protocol. On the unix system, `unix socket` is used, and on the windows system, `tcp` protocol is used.
+本项目分为前端和后端两个部分，前端使用`flutter`，后端使用`Golang`，两边通过`http`协议进行通讯，在 unix 系统下，使用的是`unix socket`，在 windows 系统下，使用的是`tcp`协议。
 
-> The front code is located in the `ui/flutter` directory.
+> 前端代码位于`ui/flutter`目录下。
 
-### 🌍 Environment
+### 🌍 环境要求
 
 1. Golang 1.24+
 2. Flutter 3.38+
 
-### 📋 Clone
+### 📋 克隆项目
 
 ```bash
 git clone git@github.com:GopeedLab/gopeed.git
 ```
 
-### 🤝 Contributing
+### 🤝 贡献代码
 
-Please refer to [CONTRIBUTING.md](/CONTRIBUTING.md)
+请参考[贡献指南](CONTRIBUTING_zh-CN.md)
 
-### 🏗️ Build
+### 🏗️ 编译
 
-#### Desktop
+#### 桌面端
 
-First, you need to configure the environment according to the official [Flutter desktop website documention](https://docs.flutter.dev/development/platform-integration/desktop), then you will need to ensure the cgo environment is set up accordingly. For detailed instructions on setting up the cgo environment, please refer to relevant resources available online.
+首先需要按照[flutter desktop 官网文档](https://docs.flutter.dev/development/platform-integration/desktop)进行环境配置，然后需要准备好`cgo`环境，具体可以自行搜索。
 
-command:
+构建命令：
 
 - windows
 
@@ -246,9 +237,9 @@ cd ui/flutter
 flutter build linux
 ```
 
-#### Mobile
+#### 移动端
 
-Same as before, you also need to prepare the `cgo` environment, and then install `gomobile`:
+同样的也是需要准备好`cgo`环境，接着安装`gomobile`：
 
 ```bash
 go install golang.org/x/mobile/cmd/gomobile@latest
@@ -256,7 +247,7 @@ go get golang.org/x/mobile/bind
 gomobile init
 ```
 
-command:
+构建命令：
 
 - android
 
@@ -274,9 +265,9 @@ cd ui/flutter
 flutter build ios --no-codesign
 ```
 
-#### Web
+#### Web 端
 
-command:
+构建命令：
 
 ```bash
 cd ui/flutter
@@ -287,18 +278,18 @@ cp -r ui/flutter/build/web cmd/web/dist
 go build -tags nosqlite,web -ldflags="-s -w" -o bin/ github.com/GopeedLab/gopeed/cmd/web
 ```
 
-## ❤️ Credits
+## ❤️ 感谢
 
-### 👥 Contributors
+### 贡献者
 
 <a href="https://github.com/GopeedLab/gopeed/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=GopeedLab/gopeed" />
 </a>
 
-### 🏢 JetBrains
+### JetBrains
 
 [![goland](_docs/img/goland.svg)](https://www.jetbrains.com/?from=gopeed)
 
-## 📄 License
+## 开源许可
 
-[GPLv3](LICENSE)
+基于 [GPLv3](LICENSE) 协议开源。
