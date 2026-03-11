@@ -73,9 +73,10 @@ jobs:
           gomobile init
 
       - name: Build Android AAR (libgopeed)
+        id: gomobile_build
+        continue-on-error: true
         run: |
           mkdir -p ui/flutter/android/app/libs
-          set -o pipefail
           gomobile bind \
             -tags nosqlite \
             -ldflags="-w -s -checklinkname=0 -X github.com/GopeedLab/gopeed/pkg/base.Version=v1.0.0" \
@@ -85,10 +86,18 @@ jobs:
             -o ui/flutter/android/app/libs/libgopeed.aar \
             github.com/GopeedLab/gopeed/bind/mobile \
             2>&1 | tee /tmp/gomobile-out.txt
-          EXIT=${PIPESTATUS[0]}
-          echo "## Gomobile Output" >> $GITHUB_STEP_SUMMARY
-          cat /tmp/gomobile-out.txt >> $GITHUB_STEP_SUMMARY
-          exit $EXIT
+          exit ${PIPESTATUS[0]}
+
+      - name: Upload gomobile log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gomobile-log
+          path: /tmp/gomobile-out.txt
+
+      - name: Fail if gomobile failed
+        if: steps.gomobile_build.outcome == 'failure'
+        run: exit 1
 
       - name: Decode keystore
         env:
