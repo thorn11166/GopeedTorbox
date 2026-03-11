@@ -18,6 +18,9 @@ jobs:
   build-android:
     if: ${{ github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +29,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
+          cache-dependency-path: go.sum
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -40,6 +44,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Install Android NDK
+        run: |
+          ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;27.2.12479018" 2>&1 | tail -5
+          echo "ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/27.2.12479018" >> $GITHUB_ENV
+
       - name: Install gomobile
         run: |
           go install golang.org/x/mobile/cmd/gomobile@latest
@@ -47,6 +56,7 @@ jobs:
 
       - name: Build Android AAR (libgopeed)
         run: |
+          mkdir -p ui/flutter/android/app/libs
           cd bind/mobile
           gomobile bind \
             -target=android \
@@ -60,7 +70,7 @@ jobs:
         run: |
           echo "$APK_KEYSTORE" | base64 -d > ui/flutter/android/app/upload-keystore.jks
 
-      - name: Build APK
+      - name: Build APK (split per ABI)
         env:
           APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
           APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
