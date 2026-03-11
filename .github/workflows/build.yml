@@ -28,7 +28,6 @@ jobs:
           shopt -s dotglob
           cp -r src-extract/gopeed-torbox/. .
           rm -rf src-extract
-          echo "go.mod header:" && head -5 go.mod
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -62,9 +61,6 @@ jobs:
           fi
           echo "Found NDK: $NDK_DIR"
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
-          echo "## Environment" >> $GITHUB_STEP_SUMMARY
-          echo "- NDK: $NDK_DIR" >> $GITHUB_STEP_SUMMARY
-          echo "- Go: $(go version)" >> $GITHUB_STEP_SUMMARY
 
       - name: Install gomobile
         run: |
@@ -73,8 +69,6 @@ jobs:
           gomobile init
 
       - name: Build Android AAR (libgopeed)
-        id: gomobile_build
-        continue-on-error: true
         run: |
           mkdir -p ui/flutter/android/app/libs
           gomobile bind \
@@ -84,20 +78,7 @@ jobs:
             -androidapi=21 \
             -javapkg=com.gopeed \
             -o ui/flutter/android/app/libs/libgopeed.aar \
-            github.com/GopeedLab/gopeed/bind/mobile \
-            2>&1 | tee /tmp/gomobile-out.txt
-          exit ${PIPESTATUS[0]}
-
-      - name: Upload gomobile log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gomobile-log
-          path: /tmp/gomobile-out.txt
-
-      - name: Fail if gomobile failed
-        if: steps.gomobile_build.outcome == 'failure'
-        run: exit 1
+            github.com/GopeedLab/gopeed/bind/mobile
 
       - name: Decode keystore
         env:
