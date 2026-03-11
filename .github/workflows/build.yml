@@ -71,6 +71,7 @@ jobs:
       - name: Build Android AAR (libgopeed)
         run: |
           mkdir -p ui/flutter/android/app/libs
+          set -o pipefail
           gomobile bind \
             -tags nosqlite \
             -ldflags="-w -s -checklinkname=0 -X github.com/GopeedLab/gopeed/pkg/base.Version=v1.0.0" \
@@ -78,7 +79,9 @@ jobs:
             -androidapi=21 \
             -javapkg=com.gopeed \
             -o ui/flutter/android/app/libs/libgopeed.aar \
-            github.com/GopeedLab/gopeed/bind/mobile
+            github.com/GopeedLab/gopeed/bind/mobile \
+            2>&1 | tee /tmp/gomobile-out.txt
+          exit ${PIPESTATUS[0]}
 
       - name: Decode keystore
         env:
