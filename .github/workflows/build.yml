@@ -109,13 +109,25 @@ jobs:
           echo "$APK_KEYSTORE" | base64 -d > ui/flutter/android/app/upload-keystore.jks
 
       - name: Build APK (split per ABI)
+        id: flutter-build
+        continue-on-error: true
         env:
           APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
           APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
         run: |
           cd ui/flutter
           flutter pub get
-          flutter build apk --release --split-per-abi
+          flutter build apk --release --split-per-abi \
+            > /tmp/flutter-out.txt 2>&1
+
+      - name: Report flutter output
+        if: always()
+        run: |
+          LAST=$(tail -50 /tmp/flutter-out.txt 2>/dev/null | tr '\n' '|')
+          echo "::error title=Flutter Build Output::${LAST}"
+          if [ "${{ steps.flutter-build.outcome }}" = "failure" ]; then
+            exit 1
+          fi
 
       - name: Build Universal APK
         env:
