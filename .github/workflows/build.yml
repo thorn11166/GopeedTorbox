@@ -116,9 +116,10 @@ jobs:
           APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
         run: |
           cd ui/flutter
-          flutter pub get
-          flutter build apk --release --split-per-abi \
-            > /tmp/flutter-out.txt 2>&1
+          {
+            flutter pub get
+            flutter build apk --release --split-per-abi
+          } > /tmp/flutter-out.txt 2>&1
 
       - name: Report flutter output
         if: always()
