@@ -24,6 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Extract source from zip
+        run: |
+          unzip -o gopeed-torbox.zip -d src-extract
+          # Move extracted contents to workspace root
+          shopt -s dotglob
+          cp -r src-extract/gopeed-torbox/. .
+          rm -rf src-extract
+          ls -la
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -56,16 +65,15 @@ jobs:
           fi
           echo "Found NDK: $NDK_DIR"
           echo "ANDROID_NDK_HOME=${NDK_DIR}" >> $GITHUB_ENV
-          echo "## NDK Info" >> $GITHUB_STEP_SUMMARY
-          echo "NDK: $NDK_DIR" >> $GITHUB_STEP_SUMMARY
-          echo "Go: $(go version)" >> $GITHUB_STEP_SUMMARY
+          echo "## Environment" >> $GITHUB_STEP_SUMMARY
+          echo "- NDK: $NDK_DIR" >> $GITHUB_STEP_SUMMARY
+          echo "- Go: $(GOTOOLCHAIN=local go version)" >> $GITHUB_STEP_SUMMARY
 
       - name: Install gomobile
         run: |
           go install golang.org/x/mobile/cmd/gomobile@latest
           go install golang.org/x/mobile/cmd/gobind@latest
           gomobile init
-          echo "gomobile: $(gomobile version 2>&1 || true)" >> $GITHUB_STEP_SUMMARY
 
       - name: Build Android AAR (libgopeed)
         run: |
