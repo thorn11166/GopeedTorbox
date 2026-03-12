@@ -89,6 +89,22 @@ class TaskView extends GetView<TaskController> {
                         buildTooltipSubtitle(selectTask.value?.meta.req.url),
                     trailing: CopyButton(selectTask.value?.meta.req.url),
                   ),
+                  Builder(builder: (context) {
+                    final resolvedUrl = selectTask.value?.meta.res?.files
+                        .isNotEmpty ==
+                        true
+                        ? selectTask.value!.meta.res!.files.first.req?.url
+                        : null;
+                    if (resolvedUrl == null) return const SizedBox.shrink();
+                    final label = resolvedUrl.contains('torbox.app')
+                        ? 'TorBox CDN'
+                        : 'Direct';
+                    return ListTile(
+                      title: Text('Download via $label'),
+                      subtitle: buildTooltipSubtitle(resolvedUrl),
+                      trailing: CopyButton(resolvedUrl),
+                    );
+                  }),
                   ListTile(
                     title: Text('downloadPath'.tr),
                     subtitle:
