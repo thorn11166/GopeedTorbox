@@ -191,7 +191,11 @@ class TorBoxService {
 
   /// Returns a time-limited download URL for a specific file within a torrent.
   Future<String> requestDownloadLink(int torrentId, {int? fileId}) async {
-    final params = <String, dynamic>{'torrent_id': torrentId, 'zip_link': 'false'};
+    final params = <String, dynamic>{
+      'token': _apiKey,
+      'torrent_id': torrentId,
+      'zip_link': 'false',
+    };
     if (fileId != null) params['file_id'] = fileId;
     final res = await _dio.get('/torrents/requestdl',
         queryParameters: params, options: Options(headers: _authHeader));
