@@ -194,18 +194,19 @@ class TorBoxService {
   // ── Download links ─────────────────────────────────────────
 
   /// Returns a time-limited download URL for a specific file within a torrent.
-  Future<String> requestDownloadLink(int torrentId, {int? fileId}) async {
+  /// Set [zipLink] to true to get a ZIP archive of all files in the torrent.
+  Future<String> requestDownloadLink(int torrentId, {int? fileId, bool zipLink = false}) async {
     final log = TorBoxLog.instance;
     final keyPreview = _apiKey.isEmpty
         ? '<empty>'
         : '${_apiKey.substring(0, _apiKey.length.clamp(0, 6))}…';
-    log.info('requestDownloadLink: torrentId=$torrentId fileId=$fileId apiKey=$keyPreview');
+    log.info('requestDownloadLink: torrentId=$torrentId fileId=$fileId zip=$zipLink apiKey=$keyPreview');
     final params = <String, dynamic>{
       'token': _apiKey,
       'torrent_id': torrentId,
-      'zip_link': 'false',
+      'zip_link': zipLink ? 'true' : 'false',
     };
-    if (fileId != null) params['file_id'] = fileId;
+    if (fileId != null && !zipLink) params['file_id'] = fileId;
     final res = await _dio.get('/torrents/requestdl',
         queryParameters: params, options: Options(headers: _authHeader));
     _check(res);

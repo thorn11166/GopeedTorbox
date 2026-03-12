@@ -157,7 +157,21 @@ class TorBoxController extends GetxController {
   // ── Add torrent ───────────────────────────────────────────
 
   Future<TorBoxTask?> addMagnet(String magnet) async {
-    if (_service == null) return null;
+    if (_service == null) {
+      TorBoxLog.instance.warn('addMagnet: no service — API key not configured');
+      return null;
+    }
+    if (downloadDir.value.isEmpty) {
+      final task = TorBoxTask(
+        id: _uid(),
+        input: magnet,
+        name: _nameFromMagnet(magnet),
+        state: TorBoxTaskState.error,
+        message: 'No download directory set — open the TorBox tab and tap Change to set one.',
+      );
+      tasks.add(task);
+      return task;
+    }
     final task = TorBoxTask(
       id: _uid(),
       input: magnet,
@@ -170,7 +184,21 @@ class TorBoxController extends GetxController {
   }
 
   Future<TorBoxTask?> addTorrentFile(String filename, Uint8List bytes) async {
-    if (_service == null) return null;
+    if (_service == null) {
+      TorBoxLog.instance.warn('addTorrentFile: no service — API key not configured');
+      return null;
+    }
+    if (downloadDir.value.isEmpty) {
+      final task = TorBoxTask(
+        id: _uid(),
+        input: filename,
+        name: filename,
+        state: TorBoxTaskState.error,
+        message: 'No download directory set — open the TorBox tab and tap Change to set one.',
+      );
+      tasks.add(task);
+      return task;
+    }
     final task = TorBoxTask(
       id: _uid(),
       input: filename,
@@ -232,8 +260,8 @@ class TorBoxController extends GetxController {
   }
 
   Future<void> _pollUntilCached(TorBoxTask task) async {
-    const pollInterval = Duration(seconds: 5);
-    const maxWait = Duration(hours: 6);
+    const pollInterval = Duration(seconds: 10);
+    const maxWait = Duration(minutes: 10);
     final deadline = DateTime.now().add(maxWait);
 
     while (DateTime.now().isBefore(deadline)) {
@@ -264,7 +292,9 @@ class TorBoxController extends GetxController {
 
     _mutateTask(task, (t) {
       t.state = TorBoxTaskState.error;
-      t.message = 'Timed out waiting for TorBox to cache';
+      t.message = 'TorBox could not cache this torrent within 10 minutes. '
+          'It may be a rare or large file. '
+          'Check torbox.app for status, or re-add it later.';
     });
   }
 
@@ -275,9 +305,10 @@ class TorBoxController extends GetxController {
     });
 
     try {
-      // If there are multiple files, download each; otherwise download the whole torrent
+      // Multi-file torrents → download as a single ZIP so all files stay together.
+      // Single-file torrents → download the file directly.
       if (torrent.files.length > 1) {
-        await _downloadMultiFile(task, torrent);
+        await _downloadAsZip(task, torrent);
       } else {
         await _downloadSingleFile(task, torrent);
       }
@@ -323,37 +354,30 @@ class TorBoxController extends GetxController {
     );
   }
 
-  Future<void> _downloadMultiFile(TorBoxTask task, TorBoxTorrent torrent) async {
-    int totalDownloaded = 0;
-    final totalSize = torrent.files.fold<int>(0, (sum, f) => sum + f.size);
+  /// Downloads all files as a single ZIP archive so they stay together.
+  Future<void> _downloadAsZip(TorBoxTask task, TorBoxTorrent torrent) async {
+    final url = await _service!.requestDownloadLink(torrent.id, zipLink: true);
+    if (url.isEmpty) throw Exception('No ZIP download URL returned');
 
-    for (final file in torrent.files) {
-      if (task.state == TorBoxTaskState.error) return;
+    final zipName = '${_sanitize(torrent.name)}.zip';
+    final savePath = p.join(downloadDir.value, zipName);
 
-      final url = await _service!.requestDownloadLink(torrent.id, fileId: file.id);
-      if (url.isEmpty) continue;
+    task.cancelToken = CancelToken();
+    _mutateTask(task, (t) => t.savePath = savePath);
 
-      final savePath = p.join(downloadDir.value, _sanitize(torrent.name), _sanitize(file.name));
-      if (task.savePath == null) {
-        _mutateTask(task, (t) => t.savePath = p.join(downloadDir.value, _sanitize(torrent.name)));
-      }
-
-      task.cancelToken = CancelToken();
-      await downloadFileWithProgress(
-        url,
-        savePath,
-        cancelToken: task.cancelToken,
-        onProgress: (received, total) {
-          if (totalSize <= 0) return;
-          _mutateTask(task, (t) {
-            t.downloadedBytes = totalDownloaded + received;
-            t.downloadProgress = t.downloadedBytes / totalSize;
-          });
-        },
-      );
-      totalDownloaded += file.size;
-    }
-    _mutateTask(task, (t) => t.totalBytes = totalSize);
+    await downloadFileWithProgress(
+      url,
+      savePath,
+      cancelToken: task.cancelToken,
+      onProgress: (received, total) {
+        if (total <= 0) return;
+        _mutateTask(task, (t) {
+          t.downloadedBytes = received;
+          t.totalBytes = total;
+          t.downloadProgress = received / total;
+        });
+      },
+    );
   }
 
   void _mutateTask(TorBoxTask task, void Function(TorBoxTask) fn) {

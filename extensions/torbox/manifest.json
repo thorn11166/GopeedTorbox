@@ -26,10 +26,10 @@
     {
       "name": "zipDownload",
       "title": "Download as ZIP",
-      "description": "Bundle all files into a single ZIP archive instead of downloading them individually.",
+      "description": "Bundle all files into a single ZIP archive so everything stays together in one location. Recommended.",
       "required": false,
       "type": "boolean",
-      "value": false
+      "value": true
     },
     {
       "name": "asQueued",

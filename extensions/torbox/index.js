@@ -1,9 +1,9 @@
 const API = 'https://api.torbox.app/v1/api';
 
 // How long to wait for TorBox to cache before giving up and telling the user to retry.
-// TorBox often caches popular torrents within seconds; for others it may take longer.
-const QUICK_POLL_DURATION_MS = 90 * 1000; // 90 seconds
-const POLL_INTERVAL_MS = 5000;
+// TorBox often caches popular torrents quickly; for rare content it may take longer.
+const QUICK_POLL_DURATION_MS = 600 * 1000; // 10 minutes
+const POLL_INTERVAL_MS = 10000; // 10 seconds
 
 gopeed.events.onResolve(async function (ctx) {
   const apiKey = gopeed.settings.apiKey;
@@ -169,7 +169,9 @@ async function waitUntilCached(apiKey, torrentId, timeoutMs, skipInitialSleep) {
     }
   }
   throw new Error(
-    'TorBox is still caching this torrent. Paste the magnet again in ~1 minute to check if it\'s ready.'
+    'TorBox could not cache this torrent within 10 minutes. ' +
+    'It may be a rare or very large file. ' +
+    'Check torbox.app for status, or re-add the magnet later.'
   );
 }
 

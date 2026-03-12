@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:app_links/app_links.dart';
@@ -40,6 +41,7 @@ import '../../../routes/app_pages.dart';
 import '../../../rpc/rpc.dart';
 import '../../redirect/views/redirect_view.dart';
 import '../../../services/notification_service.dart';
+import '../../torbox/controllers/torbox_controller.dart';
 
 const unixSocketPath = 'gopeed.sock';
 
@@ -450,20 +452,79 @@ class AppController extends GetxController with WindowListener, TrayListener {
       return;
     }
 
-    String path;
-    if (uri.scheme == "magnet" ||
-        uri.scheme == "http" ||
-        uri.scheme == "https") {
-      path = uri.toString();
+    // Check if TorBox is active (API key configured).
+    // When active, route magnet links and .torrent files directly to the
+    // TorBox Flutter system instead of the Gopeed native BT fetcher.
+    final torboxKey = Database.instance.getTorBoxApiKey();
+    final torboxActive = torboxKey != null && torboxKey.isNotEmpty;
+
+    if (uri.scheme == "magnet") {
+      if (torboxActive) {
+        _routeToTorBoxMagnet(uri.toString());
+        return;
+      }
+      // No TorBox — fall through to Gopeed create dialog
+      Get.rootDelegate.offAndToNamed(Routes.REDIRECT,
+          arguments: RedirectArgs(Routes.CREATE,
+              arguments: CreateTask(req: Request(url: uri.toString()))));
+      return;
+    }
+
+    String filePath;
+    if (uri.scheme == "http" || uri.scheme == "https") {
+      Get.rootDelegate.offAndToNamed(Routes.REDIRECT,
+          arguments: RedirectArgs(Routes.CREATE,
+              arguments: CreateTask(req: Request(url: uri.toString()))));
+      return;
     } else if (uri.scheme == "file") {
-      path =
+      filePath =
           Util.isWindows() ? Uri.decodeFull(uri.path.substring(1)) : uri.path;
     } else {
-      path = (await toFile(uri.toString())).path;
+      filePath = (await toFile(uri.toString())).path;
     }
+
+    // Route .torrent files to TorBox when active
+    if (torboxActive && filePath.toLowerCase().endsWith('.torrent')) {
+      try {
+        final bytes = await File(filePath).readAsBytes();
+        final filename = path.basename(filePath);
+        _routeToTorBoxFile(filename, Uint8List.fromList(bytes));
+        return;
+      } catch (e) {
+        logger.w('Failed to read torrent file for TorBox: $e');
+        // Fall through to Gopeed create dialog
+      }
+    }
+
     Get.rootDelegate.offAndToNamed(Routes.REDIRECT,
         arguments: RedirectArgs(Routes.CREATE,
-            arguments: CreateTask(req: Request(url: path))));
+            arguments: CreateTask(req: Request(url: filePath))));
+  }
+
+  /// Find (or lazily create) the TorBoxController, add a magnet, and open the TorBox tab.
+  void _routeToTorBoxMagnet(String magnetUrl) {
+    final controller = _findOrCreateTorBoxController();
+    controller.addMagnet(magnetUrl);
+    // Navigate to the TorBox tab inside the home shell
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.rootDelegate.offAndToNamed(Routes.TORBOX);
+    });
+  }
+
+  /// Find (or lazily create) the TorBoxController, add a torrent file, and open the TorBox tab.
+  void _routeToTorBoxFile(String filename, Uint8List bytes) {
+    final controller = _findOrCreateTorBoxController();
+    controller.addTorrentFile(filename, bytes);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.rootDelegate.offAndToNamed(Routes.TORBOX);
+    });
+  }
+
+  TorBoxController _findOrCreateTorBoxController() {
+    if (Get.isRegistered<TorBoxController>()) {
+      return Get.find<TorBoxController>();
+    }
+    return Get.put<TorBoxController>(TorBoxController(), permanent: true);
   }
 
   String runningAddress() {
