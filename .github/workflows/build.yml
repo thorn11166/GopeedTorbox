@@ -18,6 +18,8 @@ jobs:
   build-android:
     if: ${{ github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
