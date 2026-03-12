@@ -5,6 +5,8 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as p;
 
+import 'torbox_log.dart';
+
 // ─────────────────────────────────────────
 // Models
 // ─────────────────────────────────────────
@@ -120,7 +122,9 @@ class TorBoxService {
           baseUrl: _base,
           connectTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
-        ));
+        )) {
+    _dio.interceptors.add(_TorBoxLogInterceptor());
+  }
 
   void updateApiKey(String key) => _apiKey = key;
 
@@ -191,6 +195,11 @@ class TorBoxService {
 
   /// Returns a time-limited download URL for a specific file within a torrent.
   Future<String> requestDownloadLink(int torrentId, {int? fileId}) async {
+    final log = TorBoxLog.instance;
+    final keyPreview = _apiKey.isEmpty
+        ? '<empty>'
+        : '${_apiKey.substring(0, _apiKey.length.clamp(0, 6))}…';
+    log.info('requestDownloadLink: torrentId=$torrentId fileId=$fileId apiKey=$keyPreview');
     final params = <String, dynamic>{
       'token': _apiKey,
       'torrent_id': torrentId,
@@ -221,6 +230,48 @@ class TorBoxService {
     if (ok == false) {
       throw Exception('TorBox error: ${res.data?['error'] ?? res.data?['detail'] ?? 'Unknown'}');
     }
+  }
+}
+
+// ─────────────────────────────────────────
+// Dio log interceptor
+// ─────────────────────────────────────────
+
+class _TorBoxLogInterceptor extends Interceptor {
+  final _log = TorBoxLog.instance;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final params = options.queryParameters.entries
+        .map((e) => '${e.key}=${e.value}')
+        .join(' ');
+    _log.info('→ ${options.method} ${options.path}'
+        '${params.isNotEmpty ? '  [$params]' : ''}');
+    super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    final status = response.statusCode;
+    final success = response.data?['success'];
+    final detail = response.data?['detail'] ?? response.data?['error'];
+    _log.info('← $status  success=$success'
+        '${detail != null ? '  detail=$detail' : ''}');
+    if (success == false || (status != null && status >= 400)) {
+      _log.warn('  Full body: ${response.data}');
+    }
+    super.onResponse(response, handler);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _log.error('✗ ${err.requestOptions.method} ${err.requestOptions.path}');
+    _log.error('  type=${err.type}  status=${err.response?.statusCode}');
+    if (err.response?.data != null) {
+      _log.error('  body=${err.response!.data}');
+    }
+    if (err.message != null) _log.error('  msg=${err.message}');
+    super.onError(err, handler);
   }
 }
 

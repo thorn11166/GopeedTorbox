@@ -2,10 +2,12 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../views/directory_selector.dart';
 import '../controllers/torbox_controller.dart';
+import '../torbox_log.dart';
 import '../torbox_service.dart';
 
 // ─────────────────────────────────────────
@@ -37,6 +39,14 @@ class TorBoxView extends GetView<TorBoxController> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.terminal_outlined),
+            tooltip: 'View logs',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const _LogViewerScreen()),
+            ),
+          ),
           Obx(() => controller.isAuthenticated.value
               ? IconButton(
                   icon: const Icon(Icons.logout),
@@ -683,6 +693,90 @@ class _ProgressRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// Log viewer screen
+// ─────────────────────────────────────────
+
+class _LogViewerScreen extends StatelessWidget {
+  const _LogViewerScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final log = TorBoxLog.instance;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('TorBox Logs'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.copy_outlined),
+            tooltip: 'Copy all',
+            onPressed: () {
+              final text = log.entries
+                  .map((e) => '[${e.timeStr}] ${e.levelTag} ${e.message}')
+                  .join('\n');
+              Clipboard.setData(ClipboardData(text: text));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Logs copied to clipboard')),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Clear',
+            onPressed: log.clear,
+          ),
+        ],
+      ),
+      body: Obx(() {
+        final entries = log.entries.reversed.toList();
+        if (entries.isEmpty) {
+          return Center(
+            child: Text('No log entries yet.',
+                style: TextStyle(color: _kMuted.withOpacity(0.6))),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          itemCount: entries.length,
+          itemBuilder: (_, i) {
+            final e = entries[i];
+            Color color;
+            switch (e.level) {
+              case TorBoxLogLevel.error:
+                color = _kDanger;
+                break;
+              case TorBoxLogLevel.warning:
+                color = const Color(0xFFFBBF24);
+                break;
+              case TorBoxLogLevel.info:
+                color = _kMuted;
+                break;
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                  children: [
+                    TextSpan(
+                        text: '${e.timeStr} ',
+                        style: TextStyle(color: _kMuted.withOpacity(0.5))),
+                    TextSpan(
+                        text: '${e.levelTag} ',
+                        style: TextStyle(
+                            color: color, fontWeight: FontWeight.bold)),
+                    TextSpan(text: e.message, style: TextStyle(color: color)),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }

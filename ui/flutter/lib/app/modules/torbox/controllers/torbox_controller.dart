@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../../database/database.dart';
+import '../torbox_log.dart';
 import '../torbox_service.dart';
 
 // ─────────────────────────────────────────
@@ -79,13 +80,17 @@ class TorBoxController extends GetxController {
   }
 
   void _loadSaved() {
+    final log = TorBoxLog.instance;
     final key = Database.instance.getTorBoxApiKey() ?? '';
     final dir = Database.instance.getTorBoxDownloadDir() ?? '';
     apiKey.value = key;
     downloadDir.value = dir;
     if (key.isNotEmpty) {
+      log.info('Loaded saved API key (${key.length} chars), initialising service');
       _service = TorBoxService(key);
       checkAuth(silent: true);
+    } else {
+      log.warn('No saved API key found');
     }
   }
 
@@ -102,7 +107,9 @@ class TorBoxController extends GetxController {
       return;
     }
 
+    final log = TorBoxLog.instance;
     authStatus.value = 'checking';
+    log.info('saveApiKey: verifying new key (${trimmed.length} chars)');
     _service = TorBoxService(trimmed);
     try {
       final user = await _service!.getUser();
@@ -110,10 +117,12 @@ class TorBoxController extends GetxController {
       isAuthenticated.value = true;
       authStatus.value = '${user.email} · ${user.plan}';
       Database.instance.saveTorBoxApiKey(trimmed);
+      log.info('Auth OK: ${user.email} plan=${user.plan}');
     } catch (e) {
       _service = null;
       isAuthenticated.value = false;
       authStatus.value = _friendlyError(e);
+      log.error('Auth failed: $e');
     }
   }
 
@@ -191,12 +200,16 @@ class TorBoxController extends GetxController {
   // ── Internal helpers ──────────────────────────────────────
 
   Future<void> _startCaching(TorBoxTask task) async {
+    final log = TorBoxLog.instance;
     _mutateTask(task, (t) => t.state = TorBoxTaskState.caching);
+    log.info('Caching magnet task=${task.id}');
     try {
       final torrentId = await _service!.addMagnet(task.input);
+      log.info('Magnet accepted: torrentId=$torrentId task=${task.id}');
       _mutateTask(task, (t) => t.torrentId = torrentId);
       await _pollUntilCached(task);
     } catch (e) {
+      log.error('addMagnet failed task=${task.id}: $e');
       _mutateTask(task, (t) {
         t.state = TorBoxTaskState.error;
         t.message = _friendlyError(e);
@@ -237,11 +250,13 @@ class TorBoxController extends GetxController {
         _mutateTask(task, (t) => t.cacheProgress = torrent.progress);
 
         if (torrent.isDownloadReady) {
+          TorBoxLog.instance.info(
+              'Torrent ready: id=${torrent.id} name="${torrent.name}" files=${torrent.files.length}');
           await _startDownloading(task, torrent);
           return;
         }
-      } catch (_) {
-        // network hiccup – just retry
+      } catch (e) {
+        TorBoxLog.instance.warn('Poll error (will retry): $e');
       }
 
       await Future.delayed(pollInterval);
@@ -273,6 +288,7 @@ class TorBoxController extends GetxController {
       });
     } catch (e) {
       if (e is DioException && e.type == DioExceptionType.cancel) return;
+      TorBoxLog.instance.error('Download failed task=${task.id}: $e');
       _mutateTask(task, (t) {
         t.state = TorBoxTaskState.error;
         t.message = _friendlyError(e);
