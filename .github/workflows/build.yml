@@ -1,6 +1,9 @@
 name: Build
 
 on:
+  push:
+    branches:
+      - 'claude/**'
   workflow_dispatch:
     inputs:
       platform:
@@ -16,7 +19,7 @@ on:
 
 jobs:
   build-android:
-    if: ${{ github.event.inputs.platform == 'android' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
