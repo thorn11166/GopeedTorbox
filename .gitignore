@@ -1,0 +1,25 @@
+# Keystore files - never commit
+*.jks
+*.keystore
+
+# Go
+/vendor/
+
+# Flutter
+ui/flutter/build/
+ui/flutter/.dart_tool/
+ui/flutter/.flutter-plugins
+ui/flutter/.flutter-plugins-dependencies
+ui/flutter/.packages
+
+# Android
+ui/flutter/android/.gradle/
+ui/flutter/android/local.properties
+ui/flutter/android/app/libs/*.aar
+
+# macOS
+.DS_Store
+
+# Source zip
+gopeed-torbox.zip
+gopeed-torbox-src/

@@ -1,6 +1,10 @@
 name: Build
 
 on:
+  push:
+    branches:
+      - 'claude/**'
+      - main
   workflow_dispatch:
     inputs:
       platform:
@@ -16,8 +20,10 @@ on:
 
 jobs:
   build-android:
-    if: ${{ github.event.inputs.platform == 'android' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +50,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.x'
+          flutter-version: '3.41.x'
           channel: 'stable'
           cache: true
 
