@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'claude/**'
+      - main
   workflow_dispatch:
     inputs:
       platform:
