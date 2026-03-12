@@ -29,6 +29,12 @@ jobs:
           cp -r src-extract/gopeed-torbox/. .
           rm -rf src-extract
 
+      - name: Patch flutter_local_notifications for Dart 3.7 compatibility
+        run: |
+          # flutter_local_notifications 20.x requires Dart ^3.8.0; stable Flutter ships Dart 3.7.x
+          sed -i 's/flutter_local_notifications: 20\.1\.0/flutter_local_notifications: ">=17.0.0 <20.0.0"/' ui/flutter/pubspec.yaml
+          rm -f ui/flutter/pubspec.lock
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
