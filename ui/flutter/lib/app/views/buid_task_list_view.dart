@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 
@@ -512,6 +513,14 @@ class BuildTaskListView extends GetView {
       padding: const EdgeInsets.all(8.0),
     );
 
+    bool isTorBoxTask() {
+      final files = task.meta.res?.files;
+      if (files != null && files.isNotEmpty) {
+        return files.any((f) => f.req?.url.contains('torbox.app') == true);
+      }
+      return false;
+    }
+
     return ContextMenuRegion(
       contextMenu: contextMenu,
       child: Obx(
@@ -556,10 +565,14 @@ class BuildTaskListView extends GetView {
                             ),
                         ],
                       ),
-                      leading: Icon(
-                        fileIcon(task.name,
-                            isFolder: isFolderTask(),
-                            isBitTorrent: task.protocol == Protocol.bt),
+                      leading: isTorBoxTask()
+                          ? const _TorBoxBadge()
+                          : Icon(
+                              fileIcon(task.name,
+                                  isFolder: isFolderTask(),
+                                  isBitTorrent:
+                                      task.protocol == Protocol.bt),
+                            ),
                       )),
                   Row(
                     children: [
@@ -677,6 +690,19 @@ class BuildTaskListView extends GetView {
               ),
             )).padding(horizontal: 14, top: 8),
       ),
+    );
+  }
+}
+
+class _TorBoxBadge extends StatelessWidget {
+  const _TorBoxBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+      'assets/icon/torbox.svg',
+      width: 36,
+      height: 36,
     );
   }
 }

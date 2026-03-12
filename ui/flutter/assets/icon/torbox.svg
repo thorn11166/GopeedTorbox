@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Top face -->
+  <polygon points="60,6 108,32 60,56 12,32" fill="#3ea55a"/>
+  <!-- Left face -->
+  <polygon points="12,32 60,56 60,108 12,82" fill="#0d5349"/>
+  <!-- Right face -->
+  <polygon points="108,32 60,56 60,108 108,82" fill="#147a78"/>
+  <!-- Lightning bolt (white) centered on right face -->
+  <polygon points="72,44 55,70 66,70 48,96 72,64 60,64 76,44" fill="white"/>
+</svg>
